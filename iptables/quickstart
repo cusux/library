@@ -1,0 +1,53 @@
+#
+# Quickstart for iptables and firewalld
+# v0.1 - 09-08-2017 - PW
+#
+
+#
+# SHORT INTRODUCTION
+#
+
+Iptables and firewalld both use the netfilter framework inside the linux kernel to access packets that flow through the network stack.
+This provides the necessary interface to inspect and manipulate packets in order to implement a firewall system.
+
+Most linux distributions use the iptables firewall, which uses the netfilter hooks to enforce firewall rules.
+RHEL/CENTOS 7 both come with an alternative service called firewalld.
+
+To most users iptables is the service of choice due to the easy syntax and long experience.
+The new firewalld service actually uses the iptables command whilst the iptables service is not installed.
+For best practices it is advised to setup and use firewalld since this service brings more and better managable features to the system administrator.
+
+#
+# FIREWALLD BASIC CONCEPTS
+#
+
+# ZONES
+The firewalld daemon manages groups of rules which are using entities called "zones".
+Zones are nothing more than a set of rules defining what traffic should be allowed according to the level of trust you have in the networks your system is connected to. Network interfaces are assinged a zone to control the firewalls behavior.
+
+For mobile systems, like laptops, this flexibility allows a good method of dynamically managing firewall rules based on the connected environment the system resides in. For example; in a typical configuration rules for public (unknown/undefined) networks are more strict while allowing less constraints when the system resides in a private network at home. For servers these types of zones are not directly important, sinces the network environment rarely changes.
+
+Firewalld is equipped with a set of pre-defined zones. In order from least to most trusted, the zones are:
+1. DROP
+   The lowest level of trust where all incoming connections are dropped without reply and only outgoing connections are possible.
+2. BLOCK
+   Similar to DROP, but instead of simply dropping connections, incoming requests are rejected with an icmp-host-prohibited or icmp6-adm-prohibited message.
+3. PUBLIC
+   Represents public (unknown/undefined) untrusted networks. You don't trust other computers but may allow selected incoming connections on a case-by-case basis.
+4. EXTERNAL
+   External networks in the event that you are using the firewall as your gateway. It is configured for NAT masquerading so that your internal network remains private but reachable.
+5. INTERNAL
+   The other side of the external zone, used for the internal portion of a gateway. The computers are fairly trustworthy and some additional services are available.
+6. DMZ
+   Used for systems located in a DMZ (isolated systems that will not have access to the rest of your network). Only certain incoming connections are allowed.
+7. WORK
+   Used for work machines. Trust most of the computers in the network. A few more services might be allowed.
+8. HOME
+   A home environment. It generally implies that you trust most of the other computers and that a few more services will be accepted.
+9. TRUSTED
+   Trust all of the machines in the network. The most open of the available options and should be used sparingly.
+
+To start using firewalld, we need to create rules and alter zone properties and also assign our network interfaces to the most appropriate zones.
+
+
+...to be continued...
