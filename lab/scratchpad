@@ -1,102 +1,60 @@
 # HP B120i not recognized, must switch software raid
-Install OS to 1 disk
+Disable HP SmartArray in BIOS.
 
-For me is solution use software raid , even then it is HW raid controller worthless. I used five SATA disks and memory card for system.
+Install the OS to the first disk.
+
+For me is solution use software raid , even then it is HW raid controller worthless.
+I used five SATA disks and memory card for system.
 
 1. Install server on one disk ( you can use USB, or memory card ,  other disks leave unpluged )
-
 2. connect all disk planed for raid array
-
 3. from command line fire command dmstup remove_all for removin device mappings
-
 4. I use command mdadm --create /dev/md0 --raid-disks=4 --level=10 /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1 for creating my raid10 array
-
 5. hot spare disk you can add with mdadm --add /dev/md0 /dev/sdf1
-
 6. verify array status mdadm --detail /dev/md0
 
 output screen should be similar this:
 
 /dev/md0:
-
 Version : 0.90
-
 Creation Time : Fri Oct 25 18:32:50 2013
-
 Raid Level : raid10
-
 Array Size : 1953519872 (1863.02 GiB 2000.40 GB)
-
 Used Dev Size : 976759936 (931.51 GiB 1000.20 GB)
-
 Raid Devices : 4
-
 Total Devices : 5
-
 Preferred Minor : 0
-
 Persistence : Superblock is persistent
 
- 
-
 Update Time : Fri Oct 25 18:44:33 2013
-
 State : clean, resyncing
-
 Active Devices : 4
-
 Working Devices : 5
-
 Failed Devices : 0
-
 Spare Devices : 1
 
- 
-
 Layout : near=2
-
 Chunk Size : 64K
-
- 
 
 Rebuild Status : 7% complete
 
- 
-
 UUID : 72335719:4b02df6c:9c363f1a:f2888934
-
 Events : 0.5
 
- 
-
 Number Major Minor RaidDevice State
-
 0 8 17 0 active sync /dev/sdb1
-
 1 8 33 1 active sync /dev/sdc1
-
 2 8 49 2 active sync /dev/sdd1
-
 3 8 65 3 active sync /dev/sde1
-
- 
-
 4 8 81 - spare /dev/sdf1
 
- 
-
 7. now you can add raid array to the xen pool  by following commands:
-
 pvcreate /dev/md0
 
 create storage repository:
-
 xe sr-create type=lvm content-type=user device-config:device=/dev/md0 name-label=raid10
 
 command return UUID of new repository, for example:
-
 6cab34a7-e640-b37a-8196-f1c2541417b3
-
- 
 
 raid array is now joined to the xen server and ready for use by standard way.
