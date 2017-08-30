@@ -1,2 +1,5 @@
 #Force process output
 if [ "$(shell_)command $> /dev/null; echo $?)" -eq "0" ]; then echo yes; else echo no; fi
+
+#Test OCSP
+openssl ocsp --issuer ca.pem -nonce -CAfile ca.pem -url http://ocsp.server/ocsp -cert mycert.pem
