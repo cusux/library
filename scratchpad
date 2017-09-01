@@ -7,3 +7,11 @@ openssl ocsp --issuer ca.pem -nonce -CAfile ca.pem -url http://ocsp.server/ocsp 
 #freeRDP
 rdp<hostname> () {
         xfreerdp -u <user> --no-nla --plugin rdpdr --data disk:Transfer:/ -- <target_host_ip>
+}
+
+#AV Scanning on UNIX including CRON
+clamscan --log=/var/log/clamav/clamd_daily.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats /home
+clamscan --log=/var/log/clamav/clamd_monthy.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats /
+
+0 0 */15 * * /usr/bin/clamscan --log=/var/log/clamav/clamd_daily.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats /home >/dev/null 2>&1
+0 0 1 * * clamscan --log=/var/log/clamav/clamd_monthy.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats / >/dev/null 2>&1
