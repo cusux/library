@@ -1,13 +1,13 @@
 #!/bin/bash
 
 #########################################
-#																				#
+#					#
 #           Verify Multi Cert           #
-#																				#
+#					#
 # OCSP request for certificate validity	#
-#																				#
+#					#
 #         2016 - Paul Wetering          #
-#																				#
+#					#
 #########################################
 
 # Output formatting
