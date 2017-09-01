@@ -3,3 +3,7 @@ if [ "$(shell_)command $> /dev/null; echo $?)" -eq "0" ]; then echo yes; else ec
 
 #Test OCSP
 openssl ocsp --issuer ca.pem -nonce -CAfile ca.pem -url http://ocsp.server/ocsp -cert mycert.pem
+
+#freeRDP
+rdp<hostname> () {
+        xfreerdp -u <user> --no-nla --plugin rdpdr --data disk:Transfer:/ -- <target_host_ip>
