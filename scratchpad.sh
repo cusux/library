@@ -9,9 +9,22 @@ rdp<hostname> () {
         xfreerdp -u <user> --no-nla --plugin rdpdr --data disk:Transfer:/ -- <target_host_ip>
 }
 
-#AV Scanning on UNIX including CRON
+#ClamAV Scanning
 clamscan --log=/var/log/clamav/clamd_daily.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats /home
 clamscan --log=/var/log/clamav/clamd_monthy.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats /
-
+#ClamAV Cron schedule
 0 0 */15 * * /usr/bin/clamscan --log=/var/log/clamav/clamd_daily.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats /home >/dev/null 2>&1
 0 0 1 * * clamscan --log=/var/log/clamav/clamd_monthy.scan -a -v -r -z --detect-pua=yes --detect-structured=yes --structured-ssn-format=2 --enable-stats / >/dev/null 2>&1
+
+# Disk to image
+dd bs=65536 if=/dev/%disc% of=%diskimagefile%
+
+# View dd output
+pgrep -l '^dd$'
+watch -n kill -USR1 %dd_pid%
+
+# Mount a partition inside an image.
+# Get blocksize and startingblock number:
+fdisk -lu %diskimagefile%
+#Mount the device with loopback and offset equal to blocksize*startingblock:
+mount -t auto -o loop,offset=$((%startingblock%*%blocksize%)) /path/to/%diskimagefile% /mnt/%mountingpoint%
