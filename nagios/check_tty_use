@@ -1,0 +1,69 @@
+#!/bin/bash
+
+#                        #
+#     Get TTY% usage     #
+# V1.5 - 05-09-2017 - PW #
+#                        #
+
+# Output formatting
+b=$(tput bold)
+n=$(tput sgr0)
+
+# Output the usage
+[  -z "$1" -o "$1" == "-h" -o -z "$2" -o "$2" == "-h" -o -z "$3" -o "$3" == "-h" ] && { echo -e "\tUsage:\n\t$0 ${b}<warning_threshold_in_hours> <critical_threshold_in_hours> <filename>${n}\t- Use a file with historical output from 'w -hs'.\n\t$0 ${b}<warning_threshold_in_hours> <critical_threshold_in_hours> live${n}\t\t- Use realtime 'w -hs' output."; exit 1; }
+
+#Define WARN and CRIT level threshold in hours
+WARN=$1
+CRIT=$2
+
+#Declare the unicorns (ALL, OK, WARNING, CRTITICAL)
+declare -i COUNTA=COUNTO=COUNTW=COUNTC=0
+
+#Input statement definition
+unset $INPUT
+[ "$3" == "live" ] && INPUT=`w -hs` || INPUT=`cat "$3"`
+
+#Sprinkle some magic fairy dust
+IFS=$'\n'
+
+#Loop through command output
+for line in $INPUT; do
+#for line in $(w -hs); do
+        COUNTA=$(($COUNTA+1))
+        IDLE=`echo ${line} | awk ' { print $5 } '`
+        #Registration TYPE
+        TYPE=`echo ${IDLE} | awk '{print substr($0,length($0),1)}' `
+        #TYPE comparison based on contents
+        if [ "${TYPE}" = "m" ]; then
+                HOUR=`echo ${IDLE} | cut -d ":" -f1`
+                HOUR=$(($HOUR+1))
+                if [ "${HOUR}" -gt "${CRIT}" ]; then
+                        ## MSG="Critical : ${line}"
+                        COUNTC=$(($COUNTC+1))
+                elif [ "${HOUR}" -gt "${WARN}" ]; then
+                        ## MSG="Warning : ${line}"
+                        COUNTW=$(($COUNTW+1))
+                else
+                        ## MSG="OK : ${line}"
+                        COUNTO=$(($COUNTO+1))
+                fi
+        else
+                ## MSG="OK : Within threshold ${line}"
+                COUNTO=$(($COUNTO+1))
+        fi
+done
+
+#Results
+if [ ${COUNTC} -gt 0 ]; then
+        EXITCODE="2"
+        TXT="CRITICAL:"
+elif [ ${COUNTW} -gt 0 ]; then
+        EXITCODE="1"
+        TXT="WARNING:"
+else
+        EXITCODE="0"
+        TXT="OK:"
+fi
+
+echo "${TXT} - OK=${COUNTO} - WARNING=${COUNTW} - CRITICAL=${COUNTC} - ALL=${COUNTA}"
+exit ${EXITCODE}
