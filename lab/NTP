@@ -4,13 +4,13 @@
   the time from this clock on boot to use this time as initial system time.
   
   Display current hardware clock time
-  $ hwclock
+    $ hwclock
 
   Hardware clock synchronisation to system clock
-  $ hwclock --hctosys
+    $ hwclock --hctosys
 
   System clock synchronisation to hardware clock
-  $ hwclock --systohc
+    $ hwclock --systohc
 
 #Stratum
   NTP servers work based on a hierachy called stratum and starting at stratum 0.
@@ -30,7 +30,7 @@
   On a local environment a firewall rule must be added to enable the NTP service.
   The following example will add the NTP service to the firewall using the default
   NTP requirements (port 123 over UDP).
-  $ firewall-cmd --add-service ntp
+    $ firewall-cmd --add-service ntp
 
 #Chrony
   Chrony is a versatile implementation of NTP. It can synchronise the system clock
@@ -40,15 +40,34 @@
   To change this synchronisation time, see variable 'rtcsync' in /etc/chrony.conf.
   On a default CentOS7/RHEL7 installation, chrony will come preinstalled on the
   system. If not, it can be installed as follows:
-  $ yum install chrony -y
+    $ yum install chrony -y
 
   After installation, the chronyd instance will not be running nor will it be
   enabled to remain persistent after a system reboot.
   
   Ensure that the chrony service starts up on system reboot:
-  $ systemctl enable chronyd
+    $ systemctl enable chronyd
 
   Ensure that the chrony service is started:
-  $ systemctl start chronyd
+    $ systemctl start chronyd
 
+  Configuration for chrony is stored in the file '/etc/chrony.conf'. The chrony
+  installation includes chronyd as well as chronyc. Chronyd is the daemon for
+  the chrony instance. Chronyc is a command line utility used to make various
+  configuration adjustments.
+  
+  In the configuration file, under the section about the public pool, custom servers
+  can be added, in example:
+  
+    server 0.centos.pool.ntp.org iburst
+    server 1.myntpserver01.local.domain iburst
+    server 2.myntpserver02.local.domain iburst
+    server 3.myntpfailover01.external.domain iburst
+    server 4.myntpfailover02.external.domain iburst
 
+  After changing any configuration setting, the chronyd instance must be restarted:
+    $ systemctl restart chronyd
+
+  Other than the configuration with fixed NTP time sources it is possible to
+  retrieve them over DHCP. This can be achieved by altering the 'PEERDNS' variable
+  in the network configuration.
