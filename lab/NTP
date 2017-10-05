@@ -1,0 +1,54 @@
+#Hardware clock
+  The hardware clock is physically present and continues to run from battery power
+  if the system is not connected to any powersource. A Linux system will read
+  the time from this clock on boot to use this time as initial system time.
+  
+  Display current hardware clock time
+  $ hwclock
+
+  Hardware clock synchronisation to system clock
+  $ hwclock --hctosys
+
+  System clock synchronisation to hardware clock
+  $ hwclock --systohc
+
+#Stratum
+  NTP servers work based on a hierachy called stratum and starting at stratum 0.
+  Stratum 0 time sources are highly exact time sources like atomic or GPS clocks.
+  Stratum 1 time sources are getting their time from stratum 0 sources, stratum 2
+  time sources are getting their time from stratum 1 sources and so forth.
+  Stratum n+1 will synchronise against stratum n where the highest limit is
+  stratum 15. Stratum 16 time sources refer to time sources that are not
+  synchronised. Time synchronisation is more accurate against a stratum 1 source
+  than a stratum 4 source.
+
+#NTP Firewall rules
+  The default port for NTP traffic is port 123, all network will use UDP protocol
+  since it is a pull request and therefore package acknowledgement is not necessary.
+  Public available time sources use this port unless otherwise specified.
+  
+  On a local environment a firewall rule must be added to enable the NTP service.
+  The following example will add the NTP service to the firewall using the default
+  NTP requirements (port 123 over UDP).
+  $ firewall-cmd --add-service ntp
+
+#Chrony
+  Chrony is a versatile implementation of NTP. It can synchronise the system clock
+  with NTP servers, reference clocks (e.g. GPS receiver) and manual input using
+  wristwatch and keyboard. On default, chrony will sync hwclock to NTP every 11
+  minutes on CentOS7/RHEL7, in previous versions this was only done at system boot.
+  To change this synchronisation time, see variable 'rtcsync' in /etc/chrony.conf.
+  On a default CentOS7/RHEL7 installation, chrony will come preinstalled on the
+  system. If not, it can be installed as follows:
+  $ yum install chrony -y
+
+  After installation, the chronyd instance will not be running nor will it be
+  enabled to remain persistent after a system reboot.
+  
+  Ensure that the chrony service starts up on system reboot:
+  $ systemctl enable chronyd
+
+  Ensure that the chrony service is started:
+  $ systemctl start chronyd
+
+
