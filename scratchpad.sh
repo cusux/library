@@ -28,3 +28,8 @@ watch -n kill -USR1 %dd_pid%
 fdisk -lu %diskimagefile%
 #Mount the device with loopback and offset equal to blocksize*startingblock:
 mount -t auto -o loop,offset=$((%startingblock%*%blocksize%)) /path/to/%diskimagefile% /mnt/%mountingpoint%
+
+
+# Test network segment for duplicate IP addresses using arping
+for ip in 10.0.0.{0..255}; do arping -D -I eth0 -c 2 $ip ; done > ./tmp.txt
+cat ./tmp.txt | grep Received | grep -v 0 | grep -v 1
