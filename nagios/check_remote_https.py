@@ -1,8 +1,10 @@
 #!/usr/bin/python2
 #
+# {{ ansible_managed }} - Role: {{ role_name }}
+#
 # Author: Paul Wetering
 #       : 2021-08-24
-#       : https://github.com/cusux
+#       : paul.wetering@hcs-company.com
 #
 # Script usage          : check_remote_https.py -f /my/hosts/file -e exception1.domain,exception2.domain
 # Server config example : command_line /usr/lib/nagios/plugins/check_remote_https.py -f <hosts_file> -e <exceptions>
@@ -49,7 +51,6 @@ ct_servers={}
 ct_ok=[]
 ct_nok=[]
 ct_flag=0
-nagios_output=[]
 nagios_ok=0
 nagios_nok=2
 
@@ -60,6 +61,7 @@ for line in lines:
   if not line == '\n':
     if not line.strip().startswith(line_comment):
       if not priv_range.search(line):
+        line=line.replace('\t', ' ')
         hosts_entry=sub(' +', ' ', line.rstrip())
         ip=hosts_entry.split(' ')[0]
         hostname=hosts_entry.split(' ')[1]
@@ -78,13 +80,14 @@ for ip in ct_servers:
   ct_message=ct_servers[ip] + '('+ ip + ')'
 
   if result == 0:
-    curl_command="curl --insecure -vvI " + ct_servers[ip] + " -H 'Connection:close'"
+    curl_command="curl --insecure --connect-timeout 1 -vvI " + ct_servers[ip] + " -H 'Connection:close'"
     awk_options="awk 'BEGIN { cert=0 } /^\* SSL connection/ { cert=1 } /^\*/ { if (cert) print }'"
     curl_status, curl_output = getstatusoutput(curl_command + " 2>&1 | " + awk_options)
 
     if curl_status == 0:
       ct_ok.append(ct_message)
     else:
+      ct_flag=1
       ct_nok.append(ct_message)
   else:
     ct_flag=1
