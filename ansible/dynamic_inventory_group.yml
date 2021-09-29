@@ -1,0 +1,11 @@
+---
+version: v1
+kind: groupObject
+metadata:
+  groupname: groupname
+spec:
+  parent_groups: []
+  group_vars:
+    group_var: value
+
+...
