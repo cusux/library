@@ -1,0 +1,13 @@
+---
+version: v1
+kind: machineObject
+metadata:
+  hostname: nodename
+spec:
+  inventory_groups:
+    - nodes
+  inventory_vars:
+    mgmt0: 10.0.0.1
+    mgmt0_gw: 10.0.0.254
+
+...
