@@ -24,7 +24,7 @@ except ImportError:
 USE_AWX = 0
 
 # Define AWX project name for the inventory, required if USE_AWX is true
-PROJECT_NAME = "dynamic_inventory"
+PROJECT_NAME = "ansible"
 
 if USE_AWX:
     if PROJECT_NAME == "":
